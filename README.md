@@ -1,5 +1,5 @@
 # 🛡️ Enterprise SOC Threat Monitoring, SIEM Log Analysis & Adversarial AI Defense
-### Hands-on Cybersecurity Lab: Splunk Enterprise SIEM Deployment, Credential-Stuffing Forensic Attribution, and NIST AI Risk Assessment
+### Hands-on Cybersecurity Lab: Splunk Enterprise SIEM Deployment, Credential-Stuffing Forensic Attribution.
 
 <p align="center">
   <img src="https://img.shields.io/badge/SIEM-Splunk_Enterprise_v9.2.2-ed5b2d.svg?style=for-the-badge&logo=splunk" />
