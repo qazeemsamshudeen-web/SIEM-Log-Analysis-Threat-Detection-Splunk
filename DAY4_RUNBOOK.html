@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Day 4 Operational Runbook: SIEM Log Analysis, Attack Detection & AI Risk Assessment</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 18mm 16mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1f2937;
+    background: #ffffff;
+    line-height: 1.5;
+    font-size: 10pt;
+  }
+
+  h1, h2, h3, h4 {
+    color: #0f172a;
+    font-weight: 700;
+    page-break-after: avoid;
+  }
+
+  h1 {
+    font-size: 18pt;
+    border-bottom: 3px solid #0284c7;
+    padding-bottom: 6px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: 12.5pt;
+    background: #f0f9ff;
+    padding: 6px 10px;
+    border-left: 4px solid #0284c7;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    font-size: 11pt;
+    color: #0369a1;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 4px 0 8px 0;
+  }
+
+  ul, ol {
+    margin: 4px 0 8px 18px;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 3px;
+  }
+
+  code {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 8.5pt;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 8pt;
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 6px 0 10px 0;
+    line-height: 1.4;
+    page-break-inside: avoid;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 12px 0;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: #e2e8f0;
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  .meta-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .meta-col {
+    display: table-cell;
+    width: 50%;
+    vertical-align: top;
+    font-size: 9pt;
+  }
+
+  .alert {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 8px 0;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+  }
+
+  .alert-info {
+    background: #f0f9ff;
+    border-left: 4px solid #0284c7;
+    color: #0369a1;
+  }
+
+  .alert-tip {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+    color: #15803d;
+  }
+
+  .alert-warning {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    color: #b45309;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<h1>OPERATIONAL RUNBOOK: SIEM Threat Detection & Incident Response</h1>
+<p style="margin-top:-6px; font-size: 10.5pt; color: #475569; font-weight: 500;">
+  Step-by-Step Reproduction Guide: Splunk SIEM Deployment, SSH Brute-Force Telemetry &amp; AI Risk Assessment
+</p>
+
+<div class="meta-box">
+  <div class="meta-col">
+    <strong>Author / Lead Analyst:</strong> Qazeem Samsudeen Temitope (<em>BlaqqSec</em>)<br>
+    <strong>Project Scope:</strong> Day 4 — Log Analysis &amp; Attack Detection<br>
+    <strong>SIEM Solution:</strong> Splunk Enterprise v9.2.2 (Linux 64-bit)
+  </div>
+  <div class="meta-col">
+    <strong>Target Server:</strong> Ubuntu Server 22.04 LTS (<code>10.0.0.5</code>)<br>
+    <strong>Attacker Station:</strong> Kali Linux VM (<code>10.0.0.3</code>)<br>
+    <strong>Attack Vector:</strong> THC-Hydra SSH Credential Guessing (MITRE T1110)
+  </div>
+</div>
+
+<div class="alert alert-info">
+  <strong>Runbook Purpose:</strong> This document serves as an exhaustive, repeatable operational runbook detailing every terminal command, download URL, configuration file, SPL search query, and XML dashboard definition required to reproduce the Day 4 Log Analysis &amp; Attack Detection lab from scratch.
+</div>
+
+<h2>Phase 1: Environment Architecture &amp; Direct Download Links</h2>
+
+<h3>1.1 Lab Network Topology</h3>
+<ul>
+  <li><strong>Subnet:</strong> VirtualBox Private Host-Only Subnet (<code>10.0.0.0/24</code>).</li>
+  <li><strong>Target Server:</strong> Ubuntu 22.04 LTS (<code>10.0.0.5</code>) hosting OpenSSH (Port 22), Apache WAF (Port 80), and Splunk Enterprise (Port 8000).</li>
+  <li><strong>Attacker Machine:</strong> Kali Linux (<code>10.0.0.3</code>) running THC-Hydra v9.7 and web browser auditing tools.</li>
+</ul>
+
+<h3>1.2 Official Splunk Enterprise Download Links</h3>
+<ul>
+  <li><strong>Direct Download URL (Linux 64-bit .deb Package):</strong><br>
+    <a href="https://download.splunk.com/products/splunk/releases/9.2.2/linux/splunk-9.2.2-d76edf6f0a15-linux-2.6-amd64.deb">https://download.splunk.com/products/splunk/releases/9.2.2/linux/splunk-9.2.2-d76edf6f0a15-linux-2.6-amd64.deb</a>
+  </li>
+  <li><strong>Official Splunk Portal:</strong> <a href="https://www.splunk.com/en_us/download/splunk-enterprise.html">https://www.splunk.com/en_us/download/splunk-enterprise.html</a></li>
+  <li><strong>Package Details:</strong> Splunk Enterprise v9.2.2 | Build: <code>d76edf6f0a15</code> | Architecture: <code>amd64</code> | Size: <code>~450 MB</code>.</li>
+</ul>
+
+<h2>Phase 2: Host Storage Optimization &amp; LVM Expansion</h2>
+
+<p>During initial deployment, the Ubuntu root partition (<code>/</code>) was 97% full (only 415 MB free), which would cause Splunk installation to abort. Ubuntu Server's LVM installer defaults to provisioning only 50% of the virtual drive.</p>
+
+<h3>2.1 Unlocking Hidden LVM Disk Space</h3>
+<pre><code># Check physical drive size and LVM Volume Group status
+sudo lsblk
+sudo vgs
+
+# Extend the logical volume to claim 100% of unallocated disk space (+11.5 GB)
+sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+
+# Expand the filesystem live without rebooting
+sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
+
+# Verify storage (Space expands from 775 MB to 12+ GB available)
+df -h /</code></pre>
+
+<h2>Phase 3: Splunk SIEM Deployment &amp; Service Initialization</h2>
+
+<h3>3.1 Download and Install Splunk Enterprise</h3>
+<pre><code># Download Splunk 9.2.2 .deb package directly via wget
+wget -O splunk.deb "https://download.splunk.com/products/splunk/releases/9.2.2/linux/splunk-9.2.2-d76edf6f0a15-linux-2.6-amd64.deb"
+
+# Install package onto Ubuntu (installs to /opt/splunk)
+sudo dpkg -i splunk.deb</code></pre>
+
+<h3>3.2 Start Splunk &amp; Set Admin Credentials</h3>
+<pre><code># Start Splunk daemon and accept software license
+sudo /opt/splunk/bin/splunk start --accept-license
+
+# Configure Administrator Credentials when prompted:
+# Username: admin
+# Password: [YourStrongPassword]
+
+# Configure Splunk to launch automatically upon system boot
+sudo /opt/splunk/bin/splunk enable boot-start</code></pre>
+
+<h3>3.3 Firewall Configuration &amp; Web Access</h3>
+<pre><code># Open Splunk Web GUI port (8000/TCP) in Ubuntu firewall
+sudo ufw allow 8000/tcp
+
+# From Kali Linux (10.0.0.3) browser, navigate to:
+# http://10.0.0.5:8000</code></pre>
+
+<div class="page-break"></div>
+
+<h2>Phase 4: Telemetry Pipeline &amp; Log Ingestion Configuration</h2>
+
+<p>To detect multi-vector attacks, Splunk was configured to ingest both operating system authentication telemetry and application firewall logs.</p>
+
+<h3>4.1 Granting File Permissions on Target Host</h3>
+<p>By default, Ubuntu restricts `/var/log/apache2/` to root/adm. Ensure Splunk has read access:</p>
+<pre><code># Set read permissions for log monitoring
+sudo chmod 644 /var/log/auth.log
+sudo chmod 644 /var/log/apache2/*.log</code></pre>
+
+<h3>4.2 Ingesting Telemetry Sources (Splunk Web UI or CLI)</h3>
+
+<h4>Option A: Web UI Configuration</h4>
+<ol>
+  <li>Navigate to <strong>Settings</strong> &gt; <strong>Data Inputs</strong> &gt; <strong>Files &amp; Directories</strong> &gt; click <strong>+ Add New</strong>.</li>
+  <li><strong>Input 1 (SSH Auth Logs):</strong>
+    <ul>
+      <li>File Path: <code>/var/log/auth.log</code></li>
+      <li>Source Type: <code>Operating System</code> &gt; <code>linux_secure</code></li>
+      <li>Index: <code>main</code> (Default)</li>
+    </ul>
+  </li>
+  <li><strong>Input 2 (Web/WAF Logs):</strong>
+    <ul>
+      <li>File Path: <code>/var/log/apache2/error.log</code></li>
+      <li>Source Type: <code>apache_error</code></li>
+      <li>Index: <code>main</code> (Default)</li>
+    </ul>
+  </li>
+</ol>
+
+<h4>Option B: CLI Direct Ingestion Command (Faster)</h4>
+<pre><code>sudo /opt/splunk/bin/splunk add monitor /var/log/auth.log -sourcetype linux_secure -auth admin:[Password]
+sudo /opt/splunk/bin/splunk add monitor /var/log/apache2/error.log -sourcetype apache_error -auth admin:[Password]</code></pre>
+
+<h2>Phase 5: Attack Simulation Execution (THC-Hydra)</h2>
+
+<p>From the Kali Linux attacker station (<code>10.0.0.3</code>), simulate an automated credential-stuffing attack targeting OpenSSH on Ubuntu (<code>10.0.0.5</code>).</p>
+
+<h3>5.1 Generating Target Credential Wordlists</h3>
+<pre><code># Generate user dictionary
+cat &lt;&lt; 'EOF' &gt; /tmp/users.txt
+root
+admin
+ubuntu
+guest
+test
+EOF
+
+# Generate password dictionary
+cat &lt;&lt; 'EOF' &gt; /tmp/passwords.txt
+123456
+password
+admin123
+letmein
+qwerty
+toor
+dragon
+welcome
+ninja
+master
+EOF</code></pre>
+
+<h3>5.2 Executing Automated SSH Brute Force</h3>
+<pre><code># Execute multi-threaded SSH credential guessing attack
+hydra -l root -P /tmp/passwords.txt -t 4 -V ssh://10.0.0.5
+
+# (Optional Multi-User Enumeration)
+hydra -L /tmp/users.txt -P /tmp/passwords.txt -t 4 ssh://10.0.0.5</code></pre>
+
+<div class="alert alert-warning">
+  <strong>Simulation Finding:</strong> Hydra initiated 4 concurrent tasks, generating 10 rapid authentication attempts against user <code>root</code>. All attempts returned authentication failure (0 valid passwords found), successfully flooding <code>/var/log/auth.log</code> with forensic telemetry.
+</div>
+
+<div class="page-break"></div>
+
+<h2>Phase 6: SIEM Threat Hunting, SPL Queries &amp; Forensic Analysis</h2>
+
+<p>In Splunk Web (<strong>Apps &gt; Search &amp; Reporting</strong>), execute the following Search Processing Language (SPL) queries to investigate the attack:</p>
+
+<h3>6.1 Core Investigation Queries</h3>
+<ul>
+  <li><strong>Detect All Failed Logins:</strong>
+    <pre><code>index=* sourcetype=linux_secure "Failed password"</code></pre>
+  </li>
+  <li><strong>Attacker Source IP Attribution &amp; Attempt Counts:</strong>
+    <pre><code>index=* sourcetype=linux_secure "Failed password" 
+| rex "from (?&lt;attacker_ip&gt;\d+\.\d+\.\d+\.\d+)" 
+| stats count as "Failed Attempts" by attacker_ip 
+| sort - "Failed Attempts"</code></pre>
+  </li>
+  <li><strong>Failure Rate Spike Analysis Over Time:</strong>
+    <pre><code>index=* sourcetype=linux_secure "Failed password" 
+| timechart span=1m count</code></pre>
+  </li>
+  <li><strong>Targeted Usernames Breakdown:</strong>
+    <pre><code>index=* sourcetype=linux_secure "Failed password" 
+| rex "Failed password for (invalid user )?(?&lt;target_user&gt;\S+)" 
+| stats count by target_user</code></pre>
+  </li>
+  <li><strong>Correlated Web Application Threat Telemetry:</strong>
+    <pre><code>index=* source=*apache* "Access denied with code 403"</code></pre>
+  </li>
+</ul>
+
+<h2>Phase 7: Building the Executive SOC Threat Dashboard (DELIVERABLE 1)</h2>
+
+<p>To produce <strong>Deliverable 1</strong>, assemble a Dark-Mode executive monitoring dashboard using Splunk Classic Simple XML.</p>
+
+<h3>7.1 Deployment Steps</h3>
+<ol>
+  <li>In Splunk, click <strong>Dashboards</strong> &gt; <strong>Create New Dashboard</strong>.</li>
+  <li>Select <strong>Classic Dashboards</strong>.</li>
+  <li>Click <strong>Edit</strong> (top right) &gt; click <strong>Source</strong>.</li>
+  <li>Replace all contents with the production XML definition below and click <strong>Save</strong>:</li>
+</ol>
+
+<pre><code>&lt;dashboard version="1.1" theme="dark"&gt;
+  &lt;label&gt;SOC Threat Monitoring - SSH Brute-Force Incident (T1110)&lt;/label&gt;
+  &lt;description&gt;Real-time detection and forensic attribution of credential-stuffing attack on Ubuntu Server&lt;/description&gt;
+  &lt;fieldset submitButton="false"&gt;
+    &lt;input type="time" token="time_picker" searchWhenChanged="true"&gt;
+      &lt;label&gt;Time Window&lt;/label&gt;
+      &lt;default&gt;
+        &lt;earliest&gt;-24h@h&lt;/earliest&gt;
+        &lt;latest&gt;now&lt;/latest&gt;
+      &lt;/default&gt;
+    &lt;/input&gt;
+  &lt;/fieldset&gt;
+  &lt;row&gt;
+    &lt;panel&gt;
+      &lt;title&gt;Total Authentication Failures (Attack Volume)&lt;/title&gt;
+      &lt;single&gt;
+        &lt;search&gt;
+          &lt;query&gt;index=* sourcetype=linux_secure "Failed password" | stats count&lt;/query&gt;
+          &lt;earliest&gt;$time_picker.earliest$&lt;/earliest&gt;
+          &lt;latest&gt;$time_picker.latest$&lt;/latest&gt;
+        &lt;/search&gt;
+        &lt;option name="colorMode"&gt;block&lt;/option&gt;
+        &lt;option name="rangeColors"&gt;["0x53a051","0xdc4e41"]&lt;/option&gt;
+        &lt;option name="rangeValues"&gt;[5]&lt;/option&gt;
+        &lt;option name="useColors"&gt;1&lt;/option&gt;
+      &lt;/single&gt;
+    &lt;/panel&gt;
+    &lt;panel&gt;
+      &lt;title&gt;Attacker Source IP Attribution&lt;/title&gt;
+      &lt;table&gt;
+        &lt;search&gt;
+          &lt;query&gt;index=* sourcetype=linux_secure "Failed password" | rex "from (?&amp;lt;attacker_ip&amp;gt;\d+\.\d+\.\d+\.\d+)" | stats count as "Failed Attempts" by attacker_ip | sort - "Failed Attempts"&lt;/query&gt;
+          &lt;earliest&gt;$time_picker.earliest$&lt;/earliest&gt;
+          &lt;latest&gt;$time_picker.latest$&lt;/latest&gt;
+        &lt;/search&gt;
+        &lt;option name="count"&gt;10&lt;/option&gt;
+        &lt;option name="drilldown"&gt;none&lt;/option&gt;
+      &lt;/table&gt;
+    &lt;/panel&gt;
+  &lt;/row&gt;
+  &lt;row&gt;
+    &lt;panel&gt;
+      &lt;title&gt;Authentication Failure Rate Spike (Attempts/min)&lt;/title&gt;
+      &lt;chart&gt;
+        &lt;search&gt;
+          &lt;query&gt;index=* sourcetype=linux_secure "Failed password" | timechart span=1m count&lt;/query&gt;
+          &lt;earliest&gt;$time_picker.earliest$&lt;/earliest&gt;
+          &lt;latest&gt;$time_picker.latest$&lt;/latest&gt;
+        &lt;/search&gt;
+        &lt;option name="charting.chart"&gt;column&lt;/option&gt;
+        &lt;option name="charting.chart.showDataLabels"&gt;all&lt;/option&gt;
+        &lt;option name="charting.legend.placement"&gt;none&lt;/option&gt;
+      &lt;/chart&gt;
+    &lt;/panel&gt;
+  &lt;/row&gt;
+&lt;/dashboard&gt;</code></pre>
+
+<div class="page-break"></div>
+
+<h2>Phase 8: System Hardening &amp; Incident Remediation</h2>
+
+<p>To close the vulnerability exposed during the simulation, execute the following host hardening controls on the Ubuntu server:</p>
+
+<h3>8.1 Deploy Fail2ban (Automated Intrusion Prevention)</h3>
+<pre><code># Install Fail2ban package
+sudo apt-get install -y fail2ban
+
+# Create local configuration override
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+# Configure SSH protection jail in /etc/fail2ban/jail.local:
+# [sshd]
+# enabled = true
+# port = 22
+# filter = sshd
+# maxretry = 5
+# bantime = 3600
+# findtime = 600
+
+# Restart and verify Fail2ban status
+sudo systemctl restart fail2ban
+sudo fail2ban-client status sshd</code></pre>
+
+<h3>8.2 Hardening SSH Daemon Configuration (<code>/etc/ssh/sshd_config</code>)</h3>
+<pre><code># Disable direct root administrative login
+sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+sudo sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+
+# Disable password authentication (Enforce SSH Public-Key Only)
+sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+# Restart SSH service
+sudo systemctl restart ssh</code></pre>
+
+<h2>Phase 9: Adversarial ML Tool Evaluation Reference (DELIVERABLE 3)</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Evaluation Domain</th>
+      <th>Specification / Finding</th>
+      <th>Standard Framework Mapping</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Selected Tool</strong></td>
+      <td><strong>Microsoft Counterfit</strong> (Automated Adversarial AI Testing)</td>
+      <td>MITRE ATLAS / NIST AI RMF</td>
+    </tr>
+    <tr>
+      <td><strong>Core Architecture</strong></td>
+      <td>Interactive CLI built on Python; wraps ART (Adversarial Robustness Toolbox) &amp; TextAttack.</td>
+      <td>Offensive AML Red-Teaming</td>
+    </tr>
+    <tr>
+      <td><strong>Key Threat Vectors</strong></td>
+      <td>Model Evasion (AML.T0015), Data Poisoning (AML.T0018), Model Inversion (AML.T0040).</td>
+      <td>OWASP Top 10 for LLM/ML</td>
+    </tr>
+    <tr>
+      <td><strong>Operational Safeguards</strong></td>
+      <td>Adversarial training on perturbed datasets; Differential Privacy; air-gapped test enclaves.</td>
+      <td>NIST AI RMF (Measure &amp; Manage)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="margin-top: 30px; text-align: center; color: #64748b; font-size: 8pt; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+  Day 4 Operational Runbook &copy; 2026 Qazeem Samsudeen Temitope (BlaqqSec). Certified Cyber Security Internship Lab Documentation.
+</div>
+
+</body>
+</html>

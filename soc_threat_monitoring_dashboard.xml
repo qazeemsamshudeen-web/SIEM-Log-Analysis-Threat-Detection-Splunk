@@ -1,0 +1,56 @@
+<dashboard version="1.1" theme="dark">
+  <label>SOC Threat Monitoring - SSH Brute-Force Incident (T1110)</label>
+  <description>Real-time detection and forensic attribution of credential-stuffing attack on Ubuntu Server</description>
+  <fieldset submitButton="false">
+    <input type="time" token="time_picker" searchWhenChanged="true">
+      <label>Time Window</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Total Authentication Failures (Attack Volume)</title>
+      <single>
+        <search>
+          <query>index=* sourcetype=linux_secure "Failed password" | stats count</query>
+          <earliest>$time_picker.earliest$</earliest>
+          <latest>$time_picker.latest$</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[5]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Attacker Source IP Attribution</title>
+      <table>
+        <search>
+          <query>index=* sourcetype=linux_secure "Failed password" | rex "from (?&lt;attacker_ip&gt;\d+\.\d+\.\d+\.\d+)" | stats count as "Failed Attempts" by attacker_ip | sort - "Failed Attempts"</query>
+          <earliest>$time_picker.earliest$</earliest>
+          <latest>$time_picker.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Authentication Failure Rate Spike (Attempts/min)</title>
+      <chart>
+        <search>
+          <query>index=* sourcetype=linux_secure "Failed password" | timechart span=1m count</query>
+          <earliest>$time_picker.earliest$</earliest>
+          <latest>$time_picker.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+  </row>
+</dashboard>
